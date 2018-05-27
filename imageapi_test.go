@@ -44,3 +44,25 @@ func TestFileAbsence(t *testing.T) {
      	t.Errorf("handler returned unexpected body: got %v want %v ", actual, expected)
      }
 }
+
+func TestWidthandHeightType(t *testing.T) {
+     request := httptest.NewRequest(http.MethodGet, "/api/resize?image_name=husky.jpeg&width=abc&height=500a", nil)
+     response_recorder := httptest.NewRecorder()
+     http.DefaultServeMux.ServeHTTP(response_recorder, request)
+     expected := "Sorry, there is something wrong with the parameters provided."
+     actual := response_recorder.Body.String()
+     if !strings.Contains(actual, expected) {
+     	t.Errorf("handler returned unexpected body: got %v want %v %v", actual, expected, response_recorder.Body.String())
+     }
+}
+
+func TestWidthandHeightRange(t *testing.T) {
+     request := httptest.NewRequest(http.MethodGet, "/api/resize?image_name=husky.jpeg&width=400&height=5000", nil)
+     response_recorder := httptest.NewRecorder()
+     http.DefaultServeMux.ServeHTTP(response_recorder, request)
+     expected := "Sorry, your requested quite a big image"
+     actual := strings.Contains(response_recorder.Body.String(),expected)
+     if actual == false {
+     	t.Errorf("handler returned unexpected body: got %v want %v", actual, expected)
+     }
+}

@@ -4,6 +4,7 @@ import(
 	"net/http"
 	"log"
 	"os"
+	"strconv"
 )
 
 func DoesImageExist(image_name string) bool {
@@ -30,7 +31,17 @@ func ImageHandler(writer http.ResponseWriter, request *http.Request){
      	ReportError(writer, "Sorry, the image you requested is not found.", 404)
 	return
     }
-    
+    width, width_conversion_status := strconv.Atoi(image_width[0])
+    height, height_conversion_status := strconv.Atoi(image_height[0])
+     if height_conversion_status != nil || width_conversion_status != nil {
+     	ReportError(writer, "Sorry, there is something wrong with the parameters provided.", 500)
+	return
+     }
+     if width > 1000 || height > 1000 {
+     	ReportError(writer, "Sorry, your requested quite a big image.", 500)
+	return
+     }
+
 
 }
 
