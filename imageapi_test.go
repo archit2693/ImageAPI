@@ -88,3 +88,26 @@ func TestInvalidFileType(t *testing.T) {
      	t.Errorf("handler returned unexpected body: got %v want %v v", actual, expected)
      }
 }
+
+func TestPngImages(t *testing.T) {
+  request := httptest.NewRequest(http.MethodGet, "/api/resize?image_name=car.png&width=500&height=400", nil)
+     response_recorder := httptest.NewRecorder()
+     http.DefaultServeMux.ServeHTTP(response_recorder, request)
+     expected := "image/png"
+     actual := strings.Contains(response_recorder.Header().Get("Content-Type"),expected)
+     if actual == false || len(response_recorder.Body.String()) < 1 {
+     	t.Errorf("handler returned unexpected body: got %v want %v .. %v", actual, expected,response_recorder.Header().Get("Content-type"))
+     }
+}
+
+func TestForCachedFile(t *testing.T) {
+  request := httptest.NewRequest(http.MethodGet, "/api/resize?image_name=car.png&width=550&height=450", nil)
+     response_recorder := httptest.NewRecorder()
+     http.DefaultServeMux.ServeHTTP(response_recorder, request)
+     expected := "image/png"
+     actual := strings.Contains(response_recorder.Header().Get("Content-Type"),expected)
+     filename := "images/cached/car.png_final_500_400.png"
+     if actual == false || len(response_recorder.Body.String()) < 1 && DoesImageExist(filename) {
+     	t.Errorf("handler returned unexpected body: got %v want %v .. %v", actual, expected,response_recorder.Header().Get("Content-type"))
+     }
+}
